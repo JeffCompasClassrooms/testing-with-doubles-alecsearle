@@ -47,7 +47,7 @@ class SquirrelServerHandler(BaseHTTPRequestHandler):
         else:
             self.handle404()
 
-    # HELPERS
+    # HELPERS (DO NOT NEED TO TEST HELPERS)
 
     def getRequestData(self):
         length = int(self.headers["Content-Length"])
