@@ -36,20 +36,97 @@ def describe_MyDB():
             mock_open.assert_called_once_with("mydatabase.db", "wb")
             mock_dump.assert_called_once_with([], mock_open.return_value)
 
-        @todo
         def it_does_not_create_database_if_it_already_exists(mocker):
-            pass
+            # set up stubs & mocks
+            mock_isfile = mocker.patch("os.path.isfile", return_value=True)
+            mock_open = mocker.patch("builtins.open", mocker.mock_open())
+            mock_dump = mocker.patch("pickle.dump")
+
+            # execute
+            db = MyDB("existing.db")
+
+            # assert what happened
+            mock_isfile.assert_called_once_with("existing.db")
+            mock_open.assert_not_called()
+            mock_dump.assert_not_called()
     
     def describe_loadStrings():
-        @todo
         def it_loads_an_array_from_a_file_and_returns_it(mocker):
-            pass
+            # set up stubs & mocks
+            expected_data = ["hello", "world", "test"]
+            mock_open = mocker.patch("builtins.open", mocker.mock_open())
+            mock_load = mocker.patch("pickle.load", return_value=expected_data)
+            mocker.patch("os.path.isfile", return_value=True)
+            
+            # execute
+            db = MyDB("test.db")
+            result = db.loadStrings()
+            
+            # assert what happened
+            mock_open.assert_called_with("test.db", "rb")
+            mock_load.assert_called_once()
+            assert result == expected_data
+
+        def it_opens_file_in_read_binary_mode(mocker):
+            # set up stubs & mocks
+            mock_open = mocker.patch("builtins.open", mocker.mock_open())
+            mock_load = mocker.patch("pickle.load", return_value=[])
+            mocker.patch("os.path.isfile", return_value=True)
+            
+            # execute on the test subject
+            db = MyDB("read_test.db")
+            db.loadStrings()
+            
+            # assert what happened
+            mock_open.assert_called_with("read_test.db", "rb")
+
     def describe_saveStrings():
-        @todo
         def it_saves_the_given_array_to_a_file(mocker):
-            pass
+            # set up stubs & mocks
+            test_data = ["item1", "item2", "item3"]
+            mock_open = mocker.patch("builtins.open", mocker.mock_open())
+            mock_dump = mocker.patch("pickle.dump")
+            mocker.patch("os.path.isfile", return_value=True)
+            
+            # execute
+            db = MyDB("save_test.db")
+            db.saveStrings(test_data)
+            
+            # assert what happened
+            mock_open.assert_called_with("save_test.db", "wb")
+            mock_dump.assert_called_once_with(test_data, mock_open.return_value)
+
+        def it_opens_file_in_write_binary_mode(mocker):
+            # set up stubs & mocks
+            mock_open = mocker.patch("builtins.open", mocker.mock_open())
+            mock_dump = mocker.patch("pickle.dump")
+            mocker.patch("os.path.isfile", return_value=True)
+            
+            # execute on the test subject
+            db = MyDB("write_test.db")
+            db.saveStrings(["test"])
+            
+            # assert what happened
+            mock_open.assert_called_with("write_test.db", "wb")
+
     
     def describe_saveString():
-        @todo
         def it_appends_string_element_to_existing_database(mocker):
-            pass
+            # set up stubs & mocks
+            existing_data = ["existing1", "existing2"]
+            new_string = "new_item"
+            expected_data = ["existing1", "existing2", "new_item"]
+            
+            mock_open = mocker.patch("builtins.open", mocker.mock_open())
+            mock_load = mocker.patch("pickle.load", return_value=existing_data)
+            mock_dump = mocker.patch("pickle.dump")
+            mocker.patch("os.path.isfile", return_value=True)
+            
+            # execute on the test subject
+            db = MyDB("append_test.db")
+            db.saveString(new_string)
+            
+            # assert what happened
+            mock_load.assert_called_once()
+            mock_dump.assert_called_once_with(expected_data, mock_open.return_value)
+
